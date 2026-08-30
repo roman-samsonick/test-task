@@ -1,0 +1,51 @@
+.fly-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.fly {
+  position: absolute;
+  left: 0;
+  top: 0;
+  min-width: 40px;
+  height: 40px;
+  padding: 0 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 6px 18px rgb(0 0 0 / 0.45);
+  will-change: transform, opacity;
+  animation: fly-to-slip 620ms cubic-bezier(0.32, 0, 0.4, 1) forwards;
+}
+
+/*
+ * Промежуточный кадр задаёт дугу: без него кружок идёт по прямой.
+ * Список transform-функций во всех кадрах одинаковый — иначе браузер
+ * перестаёт интерполировать и анимация дёргается.
+ */
+@keyframes fly-to-slip {
+  0% {
+    transform: translate(var(--fly-x0), var(--fly-y0)) translate(-50%, -50%) scale(0.6);
+    opacity: 0;
+  }
+  12% {
+    transform: translate(var(--fly-x0), var(--fly-y0)) translate(-50%, -50%) scale(1.1);
+    opacity: 1;
+  }
+  60% {
+    transform: translate(var(--fly-xm), var(--fly-ym)) translate(-50%, -50%) scale(0.9);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--fly-x1), var(--fly-y1)) translate(-50%, -50%) scale(0.25);
+    opacity: 0;
+  }
+}

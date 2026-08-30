@@ -1,3 +1,4 @@
+import { useFlyTarget } from '../fly/target.ts';
 import { useBetSlipState } from './useBetSlipState.ts';
 import { SelectionRow } from './SelectionRow.tsx';
 import { SizePicker } from './SizePicker.tsx';
@@ -11,9 +12,11 @@ import { Summary } from './Summary.tsx';
 export function BetSlip() {
   const { state, selections, store } = useBetSlipState();
   const hasOddsChange = selections.some((s) => s.issue === 'odds_changed');
+  // Купон — приёмник кружков, улетающих из списка событий.
+  const flyTarget = useFlyTarget();
 
   return (
-    <section className="slip">
+    <section className="slip" ref={flyTarget}>
       <div className="slip__head">
         <h2>Купон · {selections.length}</h2>
         <button

@@ -1,10 +1,13 @@
+import type { MouseEvent } from 'react';
 import type { Dictionaries } from '../../store/translationsSlice.ts';
+import type { IOutcome } from '../../types/sliceTypes.ts';
 import { useBetSlip } from '../../betslip/useBetSlip.ts';
 import { countryLabel, eventLabel, tournamentLabel } from '../labels.ts';
 import { participantLogoUrl } from '../logoUrl.ts';
 import { money } from '../format.ts';
 import type { Fixture } from '../demo/pickFixtures.ts';
 import { outcomeLabel, outcomeShortLabel, toSelection } from '../demo/toSelection.ts';
+import { useFlyToSlip } from '../fly/useFlyToSlip.ts';
 import { Logo } from './Logo.tsx';
 
 interface Props {
@@ -17,7 +20,16 @@ interface Props {
 /** Карточка события с рынком 1X2. */
 export function FixtureCard({ fixture, dictionaries, selectedIds }: Props) {
   const betSlip = useBetSlip();
+  const fly = useFlyToSlip();
   const { event, tournament, market } = fixture;
+
+  function pick(click: MouseEvent<HTMLButtonElement>, outcome: IOutcome): void {
+    // Повторный клик снимает исход — улетать в купон в этом случае нечему.
+    const adding = !selectedIds.has(outcome.outcomeId);
+
+    betSlip.toggleSelection(toSelection(dictionaries, fixture, market, outcome));
+    if (adding) fly(click, money(outcome.odds));
+  }
 
   return (
     <article className="fixture">
@@ -43,7 +55,7 @@ export function FixtureCard({ fixture, dictionaries, selectedIds }: Props) {
             // is_sportsbook_synchronized = 0 → исход нельзя принимать.
             disabled={!outcome.isSportsbookSynchronized}
             title={outcomeLabel(dictionaries, fixture, outcome)}
-            onClick={() => betSlip.toggleSelection(toSelection(dictionaries, fixture, market, outcome))}
+            onClick={(click) => pick(click, outcome)}
           >
             <span className="odd__key">{outcomeShortLabel(outcome)}</span>
             <span className="odd__value">{money(outcome.odds)}</span>
